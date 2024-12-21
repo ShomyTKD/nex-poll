@@ -1,0 +1,47 @@
+.admin_container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100vw;
+}
+
+.box_container {
+    display: flex;
+    gap: 10px;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 60%;
+    border-radius: 15px;
+    padding: 30px;
+}
+
+.inner_container {
+    display: flex;
+    gap: 20px;
+    flex-direction: column;
+    width: 100%;
+}
+
+.options_container {
+    display: flex;
+    gap: 10px;
+    flex-direction: column;
+}
+
+.add_option_btn {
+    width: 8rem;
+}
+
+.options_input_field {
+    position: relative;
+}
+
+.icon {
+    position: absolute;
+    padding: 0 0.75rem;
+    bottom: 4px;
+    right: 0;
+    width: auto;
+}
