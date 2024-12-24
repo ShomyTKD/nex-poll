@@ -1,8 +1,6 @@
-import { SendNuiMessage } from '../Utils/SendNuiMessage';
 import { FC, useEffect, useState } from 'react';
 import classes from './Admin.module.css';
-import { DEFAULT_THEME, Container, Box, Title, Text, TextInput, Button, Select, ActionIcon, Divider, Modal } from '@mantine/core';
-import { useDisclosure } from '@mantine/hooks';
+import { DEFAULT_THEME, Container, Box, Title, Text, TextInput, Button, Select, ActionIcon, Divider } from '@mantine/core';
 import { IconX, IconPlus } from '@tabler/icons-react';
 import { TriggerNuiCallback } from '../Utils/TriggerNuiCallback';
 
@@ -11,8 +9,6 @@ export const Admin: FC = () => {
     const [type, setType] = useState<string | null>('');
     const [optionValues, setOptionValues] = useState<string[]>([]);
     const [optionFieldCount, setOptionFieldsCount] = useState<number>(0);
-
-    const [opened, { open, close }] = useDisclosure(false);
 
     const handleNewOption = () => {
         if (optionFieldCount >= 8) return;
@@ -28,19 +24,15 @@ export const Admin: FC = () => {
 
     const handleFormSubmit = () => {
         if (!title || !type || optionValues.some((value) => !value)) return;
+        if (optionValues.length < 2) return;
 
         const pollData = {
             title,
             type,
-            options: optionValues
+            options: optionValues.map((option) => ({ value: option, count: 0 })),
         };
         TriggerNuiCallback('createPoll', pollData);
-        /* open(); */
     };
-
-    const handleShowPoll = () => {
-        close();
-    }
 
     useEffect(() => {
         if (optionFieldCount < 1) {
@@ -49,7 +41,7 @@ export const Admin: FC = () => {
     }, []);
 
     return (
-        <Container className={classes.admin_container}>
+        <Container className={classes.main_container}>
             <Box className={classes.box_container} bg={DEFAULT_THEME.colors.dark[9]}>
                 <Title c={DEFAULT_THEME.colors.gray[0]} order={1} align='center'>Create a Poll</Title>
                 <Text c={DEFAULT_THEME.colors.gray[5]} size='sm'>Complete the below fields to create your poll.</Text>
@@ -108,9 +100,6 @@ export const Admin: FC = () => {
                 <Divider style={{ width: '100%' }} my="md" />
                 <Button variant='filled' onClick={handleFormSubmit}>Create poll</Button>
             </Box>
-            <Modal opened={opened} onClose={close} title="Poll successfully created!" xOffset={0} centered>
-                <Button variant='filled' onClick={handleShowPoll}>Go to poll</Button>
-            </Modal>
         </Container >
     );
 };

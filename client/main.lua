@@ -1,16 +1,29 @@
 local handleNuiMessage = require('modules.nui')
 
-local pollData = nil
+local function getPollData(_, cb)
+    local pollData = lib.callback.await('nex-poll:server:getPollData')
+    cb(pollData)
+end
+
+RegisterNUICallback('getPollData', getPollData)
 
 RegisterCommand('vote', function()
-    if pollData then
-        handleNuiMessage({ action = 'setVisibleVote', data = pollData }, true)
-    else
+    local pollData = lib.callback.await('nex-poll:server:getPollData')
+    if next(pollData) == nil then
         print("No poll data available.")
+        return
     end
+    handleNuiMessage({ action = 'setVisibleVote', data = true }, true)
 end, false)
 
-RegisterCommand('createpoll', function(source, args, rawCommand)
+RegisterNUICallback('registerVote', function(data, cb)
+    TriggerServerEvent('nex-poll:server:registerVote', data)
+    lib.notify({ title = 'Vote registered', type = 'success' })
+    handleNuiMessage({ action = 'setVisibleVote', data = false }, false)
+    cb('ok')
+end)
+
+RegisterCommand('createpoll', function()
     handleNuiMessage({ action = 'setVisibleAdmin', data = true }, true)
 end, false)
 
@@ -20,6 +33,17 @@ RegisterNUICallback('createPoll', function(data, cb)
         type = data.type,
         options = data.options
     }
-    print("Poll created:", pollData.title)
+    TriggerServerEvent('nex-poll:server:createPoll', pollData)
+    lib.notify({ title = 'Poll created', type = 'success' })
+    handleNuiMessage({ action = 'setVisibleAdmin', data = false }, false)
     cb('ok')
 end)
+
+RegisterCommand('results', function()
+    local results = lib.callback.await('nex-poll:server:getPollData')
+    if next(results) == nil then
+        print("No poll data available.")
+        return
+    end
+    handleNuiMessage({ action = 'setVisibleResults', data = true }, true)
+end, false)
